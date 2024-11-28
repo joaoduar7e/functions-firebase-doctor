@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Geração PIX</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-functions-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+    <div style="max-width: 500px; margin: 20px auto; padding: 20px;">
+        <h2>Teste de Geração de PIX</h2>
+        <form id="pixForm" style="display: flex; flex-direction: column; gap: 10px;">
+            <div>
+                <label for="clinicName">Nome da Clínica:</label>
+                <input type="text" id="clinicName" required>
+            </div>
+            <div>
+                <label for="planId">ID do Plano:</label>
+                <input type="text" id="planId" required>
+            </div>
+            <div>
+                <label for="amount">Valor (R$):</label>
+                <input type="number" id="amount" step="0.01" required>
+            </div>
+            <button type="submit">Gerar PIX</button>
+        </form>
+        <div id="result" style="margin-top: 20px;"></div>
+    </div>
+
+    <script>
+        // Inicialização do Firebase
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "app-doctor-78d15.firebaseapp.com",
+            projectId: "app-doctor-78d15",
+            storageBucket: "app-doctor-78d15.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Referência à função
+        const gerarPix = firebase.functions().httpsCallable('gerarPix');
+
+        // Handler do formulário
+        document.getElementById('pixForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Gerando PIX...';
+
+            try {
+                const data = {
+                    clinicName: document.getElementById('clinicName').value,
+                    planId: document.getElementById('planId').value,
+                    amount: parseFloat(document.getElementById('amount').value)
+                };
+
+                const result = await gerarPix(data);
+                
+                resultDiv.innerHTML = `
+                    <h3>PIX Gerado com Sucesso!</h3>
+                    <p>ID da Transação: ${result.data.transaction_id}</p>
+                    <img src="${result.data.qr_code_url}" alt="QR Code PIX" style="max-width: 200px;">
+                    <p>QR Code: ${result.data.qr_code}</p>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <p style="color: red;">Erro: ${error.message}</p>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

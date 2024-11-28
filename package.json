@@ -1,0 +1,13 @@
+{
+  "name": "firebase-pagarme-integration",
+  "version": "1.0.0",
+  "description": "Firebase and Pagar.me Integration",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "firebase deploy"
+  },
+  "dependencies": {
+    "firebase-tools": "^12.9.1"
+  },
+  "private": true
+}

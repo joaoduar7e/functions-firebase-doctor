@@ -1,0 +1,102 @@
+import { z } from "zod";
+
+export const WebhookPayloadSchema = z.object({
+  id: z.string(),
+  account: z.object({
+    id: z.string(),
+    name: z.string(),
+  }),
+  type: z.enum([
+    "order.paid",
+    "order.payment_failed",
+    "order.created",
+    "order.canceled",
+    "order.closed",
+  ]),
+  created_at: z.string(),
+  data: z.object({
+    id: z.string(),
+    code: z.string(),
+    amount: z.number(),
+    currency: z.string(),
+    closed: z.boolean(),
+    items: z.array(z.object({
+      id: z.string(),
+      amount: z.number(),
+      description: z.string(),
+      quantity: z.number(),
+      status: z.string(),
+      created_at: z.string(),
+      updated_at: z.string(),
+    })),
+    customer: z.object({
+      id: z.string(),
+      name: z.string(),
+      email: z.string(),
+      document: z.string(),
+      type: z.string(),
+      delinquent: z.boolean(),
+      created_at: z.string(),
+      updated_at: z.string(),
+      phones: z.object({
+        mobile_phone: z.object({
+          country_code: z.string(),
+          number: z.string(),
+          area_code: z.string(),
+        }),
+      }),
+      metadata: z.record(z.any()).optional(),
+    }),
+    status: z.string(),
+    created_at: z.string(),
+    updated_at: z.string(),
+    closed_at: z.string().optional(),
+    charges: z.array(z.object({
+      id: z.string(),
+      code: z.string(),
+      amount: z.number(),
+      status: z.string(),
+      currency: z.string(),
+      payment_method: z.string(),
+      paid_amount: z.number().optional(),
+      paid_at: z.string().optional(),
+      created_at: z.string(),
+      updated_at: z.string(),
+      customer: z.object({
+        id: z.string(),
+        name: z.string(),
+        email: z.string(),
+        document: z.string(),
+        type: z.string(),
+        delinquent: z.boolean(),
+        created_at: z.string(),
+        updated_at: z.string(),
+        phones: z.object({
+          mobile_phone: z.object({
+            country_code: z.string(),
+            number: z.string(),
+            area_code: z.string(),
+          }),
+        }),
+        metadata: z.record(z.any()).optional(),
+      }),
+      last_transaction: z.object({
+        id: z.string(),
+        transaction_type: z.string(),
+        amount: z.number(),
+        status: z.string(),
+        success: z.boolean(),
+        created_at: z.string(),
+        updated_at: z.string(),
+        qr_code: z.string().optional(),
+        qr_code_url: z.string().optional(),
+        expires_at: z.string().optional(),
+        metadata: z.record(z.any()).optional(),
+      }).optional(),
+    })),
+    metadata: z.record(z.any()).optional(),
+  }),
+});
+
+export type WebhookPayload = z.infer<typeof WebhookPayloadSchema>;
+export type WebhookData = WebhookPayload["data"];
