@@ -34,8 +34,7 @@ export class SubscriptionService {
           isCurrentSubscription: false,
         });
       } else if (subscription.planId !== planId) {
-        const oldSubscriptionId = subscription.subscriptionId;
-
+        // Create new subscription without cancelling the existing one
         subscriptionId = await this.subscriptionRepo.createSubscription({
           clinicName,
           planId,
@@ -45,12 +44,7 @@ export class SubscriptionService {
           expirationDate: null,
           paymentMethod: "pix",
           transactionId,
-          previousSubscriptionId: oldSubscriptionId,
-          isCurrentSubscription: false,
-        });
-
-        await this.subscriptionRepo.updateSubscription(oldSubscriptionId, {
-          status: "cancelled",
+          previousSubscriptionId: subscription.subscriptionId,
           isCurrentSubscription: false,
         });
       } else {
@@ -124,7 +118,7 @@ export class SubscriptionService {
       planType: subscription.planType,
     });
 
-    // Deactivate any existing current subscriptions for this clinic
+    // Only deactivate existing subscriptions when the new one is being paid
     await this.subscriptionRepo.deactivateOldSubscriptions(subscription.clinicName);
 
     // Update the new subscription as current and active
