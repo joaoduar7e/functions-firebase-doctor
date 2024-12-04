@@ -69,7 +69,7 @@ export class FirestoreSubscriptionRepository implements SubscriptionRepository {
 
   async deactivateOldSubscriptions(clinicName: string): Promise<void> {
     const batch = admin.firestore().batch();
-    
+
     const oldSubscriptions = await this.subscriptionsRef
       .where("clinicName", "==", clinicName)
       .where("isCurrentSubscription", "==", true)
