@@ -31,6 +31,7 @@ export class SubscriptionService {
           expirationDate: null,
           paymentMethod: "pix",
           transactionId,
+          isCurrentSubscription: false,
         });
       } else if (subscription.planId !== planId) {
         const oldSubscriptionId = subscription.subscriptionId;
@@ -45,10 +46,12 @@ export class SubscriptionService {
           paymentMethod: "pix",
           transactionId,
           previousSubscriptionId: oldSubscriptionId,
+          isCurrentSubscription: false,
         });
 
         await this.subscriptionRepo.updateSubscription(oldSubscriptionId, {
           status: "cancelled",
+          isCurrentSubscription: false,
         });
       } else {
         subscriptionId = subscription.subscriptionId;
@@ -121,10 +124,15 @@ export class SubscriptionService {
       planType: subscription.planType,
     });
 
+    // Deactivate any existing current subscriptions for this clinic
+    await this.subscriptionRepo.deactivateOldSubscriptions(subscription.clinicName);
+
+    // Update the new subscription as current and active
     await this.subscriptionRepo.updateSubscription(subscription.subscriptionId, {
       status: "active",
       lastPaymentDate: admin.firestore.Timestamp.fromDate(paymentDate),
       expirationDate: expirationDate ? admin.firestore.Timestamp.fromDate(expirationDate) : null,
+      isCurrentSubscription: true,
     });
 
     await this.transactionRepo.updateTransactionStatus(
@@ -146,6 +154,7 @@ export class SubscriptionService {
   ): Promise<void> {
     await this.subscriptionRepo.updateSubscription(subscription.subscriptionId, {
       status: "expired",
+      isCurrentSubscription: false,
     });
     await this.transactionRepo.updateTransactionStatus(transaction.transactionId, "failed");
   }
@@ -158,6 +167,7 @@ export class SubscriptionService {
         if (subscription.planType !== "lifetime") {
           await this.subscriptionRepo.updateSubscription(subscription.subscriptionId, {
             status: "expired",
+            isCurrentSubscription: false,
           });
 
           functions.logger.info(`Subscription expired: ${subscription.subscriptionId}`);

@@ -28,6 +28,7 @@ export class FirestoreSubscriptionRepository implements SubscriptionRepository {
     const snapshot = await this.subscriptionsRef
       .where("clinicName", "==", clinicName)
       .where("status", "in", ["active", "pending"])
+      .where("isCurrentSubscription", "==", true)
       .limit(1)
       .get();
 
@@ -42,6 +43,7 @@ export class FirestoreSubscriptionRepository implements SubscriptionRepository {
   async getActiveSubscriptions(): Promise<Subscription[]> {
     const snapshot = await this.subscriptionsRef
       .where("status", "==", "active")
+      .where("isCurrentSubscription", "==", true)
       .get();
 
     return snapshot.docs.map((doc) => ({
@@ -56,11 +58,31 @@ export class FirestoreSubscriptionRepository implements SubscriptionRepository {
       .where("status", "==", "active")
       .where("planType", "!=", "lifetime")
       .where("expirationDate", "<=", now)
+      .where("isCurrentSubscription", "==", true)
       .get();
 
     return snapshot.docs.map((doc) => ({
       ...doc.data(),
       subscriptionId: doc.id,
     })) as Subscription[];
+  }
+
+  async deactivateOldSubscriptions(clinicName: string): Promise<void> {
+    const batch = admin.firestore().batch();
+    
+    const oldSubscriptions = await this.subscriptionsRef
+      .where("clinicName", "==", clinicName)
+      .where("isCurrentSubscription", "==", true)
+      .get();
+
+    oldSubscriptions.docs.forEach((doc) => {
+      batch.update(doc.ref, {
+        isCurrentSubscription: false,
+        status: "cancelled",
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+    });
+
+    await batch.commit();
   }
 }
