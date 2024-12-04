@@ -46,6 +46,7 @@ export interface Subscription {
   previousSubscriptionId?: string;
   testStartDate?: Timestamp;
   testEndDate?: Timestamp;
+  isCurrentSubscription: boolean;
 }
 
 export interface SubscriptionRepository {
@@ -54,4 +55,5 @@ export interface SubscriptionRepository {
   getSubscriptionByClinicName(clinicName: string): Promise<Subscription | null>;
   getActiveSubscriptions(): Promise<Subscription[]>;
   getExpiredSubscriptions(): Promise<Subscription[]>;
+  deactivateOldSubscriptions(clinicName: string): Promise<void>;
 }
