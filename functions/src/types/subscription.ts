@@ -30,18 +30,22 @@ export interface Transaction {
 
 export type PlanType = "monthly" | "yearly" | "lifetime";
 
+export type SubscriptionStatus = "active" | "pending" | "expired" | "cancelled" | "testing";
+
 export interface Subscription {
   subscriptionId: string;
   clinicName: string;
   planId: string;
   planType: PlanType;
-  status: "active" | "pending" | "expired" | "cancelled";
+  status: SubscriptionStatus;
   startDate: FieldValue;
   expirationDate: Timestamp | null;
   lastPaymentDate?: FieldValue;
   paymentMethod: "pix";
   transactionId?: string;
   previousSubscriptionId?: string;
+  testStartDate?: Timestamp;
+  testEndDate?: Timestamp;
 }
 
 export interface SubscriptionRepository {
