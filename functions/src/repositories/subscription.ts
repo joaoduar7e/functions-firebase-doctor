@@ -55,10 +55,8 @@ export class FirestoreSubscriptionRepository implements SubscriptionRepository {
   async getExpiredSubscriptions(): Promise<Subscription[]> {
     const now = admin.firestore.Timestamp.now();
     const snapshot = await this.subscriptionsRef
-      .where("status", "==", "active")
-      .where("planType", "!=", "lifetime")
+      .where("status", "in", ["active", "testing"])
       .where("expirationDate", "<=", now)
-      .where("isCurrentSubscription", "==", true)
       .get();
 
     return snapshot.docs.map((doc) => ({

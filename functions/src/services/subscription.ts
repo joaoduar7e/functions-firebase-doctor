@@ -34,7 +34,6 @@ export class SubscriptionService {
           isCurrentSubscription: false,
         });
       } else if (subscription.planId !== planId) {
-        // Create new subscription without cancelling the existing one
         subscriptionId = await this.subscriptionRepo.createSubscription({
           clinicName,
           planId,
@@ -118,10 +117,8 @@ export class SubscriptionService {
       planType: subscription.planType,
     });
 
-    // Only deactivate existing subscriptions when the new one is being paid
     await this.subscriptionRepo.deactivateOldSubscriptions(subscription.clinicName);
 
-    // Update the new subscription as current and active
     await this.subscriptionRepo.updateSubscription(subscription.subscriptionId, {
       status: "active",
       lastPaymentDate: admin.firestore.Timestamp.fromDate(paymentDate),
@@ -158,14 +155,15 @@ export class SubscriptionService {
       const expiredSubscriptions = await this.subscriptionRepo.getExpiredSubscriptions();
 
       for (const subscription of expiredSubscriptions) {
-        if (subscription.planType !== "lifetime") {
-          await this.subscriptionRepo.updateSubscription(subscription.subscriptionId, {
-            status: "expired",
-            isCurrentSubscription: false,
-          });
+        await this.subscriptionRepo.updateSubscription(subscription.subscriptionId, {
+          status: "expired",
+        });
 
-          functions.logger.info(`Subscription expired: ${subscription.subscriptionId}`);
-        }
+        functions.logger.info(`Subscription expired: ${subscription.subscriptionId}`, {
+          clinicName: subscription.clinicName,
+          planId: subscription.planId,
+          expirationDate: subscription.expirationDate,
+        });
       }
     } catch (error) {
       functions.logger.error("Error checking expired subscriptions:", error);

@@ -47,3 +47,19 @@ export const handlePaymentWebhook = functions.https.onRequest(async (req, res) =
     }
   }
 });
+
+// New scheduled function to check expired subscriptions
+export const checkExpiredSubscriptions = functions.pubsub
+  .schedule("0 0 * * *") // Runs at midnight every day
+  .timeZone("America/Sao_Paulo") // Brazilian timezone
+  .onRun(async (context) => {
+    try {
+      functions.logger.info("Starting daily subscription expiration check");
+      await subscriptionService.checkExpiredSubscriptions();
+      functions.logger.info("Completed daily subscription expiration check");
+      return null;
+    } catch (error) {
+      functions.logger.error("Error checking expired subscriptions:", error);
+      throw error;
+    }
+  });
