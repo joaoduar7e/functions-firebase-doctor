@@ -42,7 +42,7 @@ export class FirestoreSubscriptionRepository implements SubscriptionRepository {
 
   async getActiveSubscriptions(): Promise<Subscription[]> {
     const snapshot = await this.subscriptionsRef
-      .where("status", "==", "active")
+      .where("status", "in", ["active", "testing"])
       .where("isCurrentSubscription", "==", true)
       .get();
 
@@ -55,10 +55,9 @@ export class FirestoreSubscriptionRepository implements SubscriptionRepository {
   async getExpiredSubscriptions(): Promise<Subscription[]> {
     const now = admin.firestore.Timestamp.now();
     const snapshot = await this.subscriptionsRef
-      .where("status", "==", "active")
-      .where("planType", "!=", "lifetime")
-      .where("expirationDate", "<=", now)
+      .where("status", "in", ["active", "testing"])
       .where("isCurrentSubscription", "==", true)
+      .where("expirationDate", "<=", now)
       .get();
 
     return snapshot.docs.map((doc) => ({
@@ -69,7 +68,7 @@ export class FirestoreSubscriptionRepository implements SubscriptionRepository {
 
   async deactivateOldSubscriptions(clinicName: string): Promise<void> {
     const batch = admin.firestore().batch();
-    
+
     const oldSubscriptions = await this.subscriptionsRef
       .where("clinicName", "==", clinicName)
       .where("isCurrentSubscription", "==", true)

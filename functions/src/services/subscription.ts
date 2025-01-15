@@ -158,14 +158,18 @@ export class SubscriptionService {
       const expiredSubscriptions = await this.subscriptionRepo.getExpiredSubscriptions();
 
       for (const subscription of expiredSubscriptions) {
-        if (subscription.planType !== "lifetime") {
-          await this.subscriptionRepo.updateSubscription(subscription.subscriptionId, {
-            status: "expired",
-            isCurrentSubscription: false,
-          });
+        functions.logger.info("Processing expired subscription:", {
+          subscriptionId: subscription.subscriptionId,
+          clinicName: subscription.clinicName,
+          expirationDate: subscription.expirationDate,
+          currentStatus: subscription.status,
+        });
 
-          functions.logger.info(`Subscription expired: ${subscription.subscriptionId}`);
-        }
+        await this.subscriptionRepo.updateSubscription(subscription.subscriptionId, {
+          status: "expired",
+        });
+
+        functions.logger.info(`Subscription expired and updated: ${subscription.subscriptionId}`);
       }
     } catch (error) {
       functions.logger.error("Error checking expired subscriptions:", error);
