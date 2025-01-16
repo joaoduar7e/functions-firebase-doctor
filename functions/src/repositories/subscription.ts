@@ -53,17 +53,39 @@ export class FirestoreSubscriptionRepository implements SubscriptionRepository {
   }
 
   async getExpiredSubscriptions(): Promise<Subscription[]> {
-    const now = admin.firestore.Timestamp.now();
+    const now = new Date();
     const snapshot = await this.subscriptionsRef
       .where("status", "in", ["active", "testing"])
-      .where("isCurrentSubscription", "==", true)
-      .where("expirationDate", "<=", now)
       .get();
 
-    return snapshot.docs.map((doc) => ({
-      ...doc.data(),
-      subscriptionId: doc.id,
-    })) as Subscription[];
+    // Filtra localmente as subscrições expiradas
+    const expiredSubscriptions = snapshot.docs
+      .map((doc) => ({ ...doc.data(), subscriptionId: doc.id } as Subscription))
+      .filter((sub) => {
+        if (!sub.expirationDate) {
+          return false;
+        }
+
+        let expirationDate: Date;
+
+        // Verifica se é um Timestamp do Firestore
+        if (sub.expirationDate instanceof admin.firestore.Timestamp) {
+          expirationDate = sub.expirationDate.toDate();
+        } else if (typeof sub.expirationDate === "string") {
+          expirationDate = new Date(sub.expirationDate);
+        } else {
+          return false;
+        }
+
+        // Verifica se a data é válida
+        if (isNaN(expirationDate.getTime())) {
+          return false;
+        }
+
+        return expirationDate < now;
+      });
+
+    return expiredSubscriptions;
   }
 
   async deactivateOldSubscriptions(clinicName: string): Promise<void> {

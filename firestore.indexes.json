@@ -5,10 +5,6 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "isCurrentSubscription",
-          "order": "ASCENDING"
-        },
-        {
           "fieldPath": "status",
           "order": "ASCENDING"
         },

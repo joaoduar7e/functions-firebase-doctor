@@ -157,6 +157,8 @@ export class SubscriptionService {
     try {
       const expiredSubscriptions = await this.subscriptionRepo.getExpiredSubscriptions();
 
+      functions.logger.info(`Found ${expiredSubscriptions.length} expired subscriptions`);
+
       for (const subscription of expiredSubscriptions) {
         functions.logger.info("Processing expired subscription:", {
           subscriptionId: subscription.subscriptionId,
@@ -167,6 +169,7 @@ export class SubscriptionService {
 
         await this.subscriptionRepo.updateSubscription(subscription.subscriptionId, {
           status: "expired",
+          isCurrentSubscription: false,
         });
 
         functions.logger.info(`Subscription expired and updated: ${subscription.subscriptionId}`);
