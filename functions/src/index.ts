@@ -50,7 +50,7 @@ export const handlePaymentWebhook = functions.https.onRequest(async (req, res) =
 
 // New scheduled function to check expired subscriptions
 export const checkExpiredSubscriptions = functions.pubsub
-  .schedule("46 11 * * *") // Runs at 15:20 every day
+.schedule("0 0 * * *") // Executa todo dia à meia-noite
   .timeZone("America/Sao_Paulo")
   .onRun(async () => {
     try {
