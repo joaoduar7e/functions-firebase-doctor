@@ -17,7 +17,7 @@ export class PagarMeService {
         ...pagarmeData,
         items: pagarmeData.items.map((item) => ({
           ...item,
-          amount: Math.round(item.amount * 100),
+          amount: Math.round((item.amount / 100) * 100),
         })),
       };
 
