@@ -23,7 +23,7 @@ const ItemSchema = z.object({
 const PixPaymentSchema = z.object({
   payment_method: z.literal("pix"),
   pix: z.object({
-    expires_in: z.number(),
+    expires_in: z.number().default(86400), // Default to 24 hours in seconds
     additional_information: z.array(
       z.object({
         name: z.string(),

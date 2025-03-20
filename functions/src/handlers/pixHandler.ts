@@ -23,8 +23,20 @@ export class PixHandler {
         );
       }
 
+      // Ensure payment data has fixed 24-hour expiration
+      const pagarmeData = {
+        ...validatedData.pagarmeData,
+        payments: validatedData.pagarmeData.payments.map((payment) => ({
+          ...payment,
+          pix: {
+            ...payment.pix,
+            expires_in: 86400, // 24 hours in seconds (fixed value)
+          },
+        })),
+      };
+
       const pagarmeService = new PagarMeService(this.apiKey);
-      const pagarmeResponse = await pagarmeService.createPixTransaction(validatedData.pagarmeData);
+      const pagarmeResponse = await pagarmeService.createPixTransaction(pagarmeData);
 
       const transactionId = await this.transactionRepo.saveTransaction(
         validatedData.clinicName,
