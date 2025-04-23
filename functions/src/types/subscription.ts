@@ -52,6 +52,7 @@ export interface Subscription {
 export interface SubscriptionRepository {
   createSubscription(data: Omit<Subscription, "subscriptionId">): Promise<string>;
   updateSubscription(subscriptionId: string, data: Partial<Subscription>): Promise<void>;
+  getSubscriptionById(subscriptionId: string): Promise<Subscription | null>;
   getSubscriptionByClinicName(clinicName: string): Promise<Subscription | null>;
   getActiveSubscriptions(): Promise<Subscription[]>;
   getExpiredSubscriptions(): Promise<Subscription[]>;

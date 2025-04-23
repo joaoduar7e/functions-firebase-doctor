@@ -23,6 +23,9 @@ export class PixHandler {
         );
       }
 
+      // Normalize clinic name to lowercase before saving
+      const normalizedClinicName = validatedData.clinicName.toLowerCase();
+
       // Ensure payment data has fixed 24-hour expiration
       const pagarmeData = {
         ...validatedData.pagarmeData,
@@ -39,7 +42,7 @@ export class PixHandler {
       const pagarmeResponse = await pagarmeService.createPixTransaction(pagarmeData);
 
       const transactionId = await this.transactionRepo.saveTransaction(
-        validatedData.clinicName,
+        normalizedClinicName,
         validatedData.planId,
         validatedData.amount,
         context.auth.uid,
@@ -48,7 +51,7 @@ export class PixHandler {
       );
 
       const subscriptionId = await this.subscriptionService.handleNewTransaction(
-        validatedData.clinicName,
+        normalizedClinicName,
         validatedData.planId,
         "monthly", // Default to monthly plan type
         transactionId
