@@ -259,7 +259,6 @@ export class SubscriptionService {
 
         await this.subscriptionRepo.updateSubscription(subscription.subscriptionId, {
           status: "expired",
-          isCurrentSubscription: false,
         });
 
         functions.logger.info(`Subscription expired and updated: ${subscription.subscriptionId}`);
