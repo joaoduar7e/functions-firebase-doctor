@@ -142,34 +142,36 @@ export class FirestoreSubscriptionRepository implements SubscriptionRepository {
   async getExpiredSubscriptions(): Promise<Subscription[]> {
     functions.logger.info("Getting expired subscriptions");
 
-    const now = new Date();
-    const snapshot = await this.subscriptionsRef
-      .where("status", "in", ["active", "testing"])
+    const now = admin.firestore.Timestamp.now();
+    // Calcula a data de 15 dias atrás para limitar o range de busca
+    const fifteenDaysAgo = admin.firestore.Timestamp.fromMillis(
+      now.toMillis() - 15 * 24 * 60 * 60 * 1000
+    );
+
+    // Query otimizada: busca apenas assinaturas que expiraram nos últimos 15 dias
+    // Isso reduz drasticamente o consumo de leituras do Firestore
+    // Assinaturas que expiraram há mais tempo provavelmente já foram processadas
+    // Usa <= para incluir assinaturas que expiram exatamente no momento da verificação
+    // O Firestore ignora documentos com expirationDate = null em comparações
+    const activeSnapshot = await this.subscriptionsRef
+      .where("status", "==", "active")
+      .where("expirationDate", ">=", fifteenDaysAgo)
+      .where("expirationDate", "<=", now)
       .get();
 
-    const expiredSubscriptions = snapshot.docs
+    const testingSnapshot = await this.subscriptionsRef
+      .where("status", "==", "testing")
+      .where("expirationDate", ">=", fifteenDaysAgo)
+      .where("expirationDate", "<=", now)
+      .get();
+
+    const expiredSubscriptions = [
+      ...activeSnapshot.docs,
+      ...testingSnapshot.docs,
+    ]
       .map((doc) => ({ ...doc.data(), subscriptionId: doc.id } as Subscription))
-      .filter((sub) => {
-        if (!sub.expirationDate) {
-          return false;
-        }
-
-        let expirationDate: Date;
-
-        if (sub.expirationDate instanceof admin.firestore.Timestamp) {
-          expirationDate = sub.expirationDate.toDate();
-        } else if (typeof sub.expirationDate === "string") {
-          expirationDate = new Date(sub.expirationDate);
-        } else {
-          return false;
-        }
-
-        if (isNaN(expirationDate.getTime())) {
-          return false;
-        }
-
-        return expirationDate < now;
-      });
+      // Filtro adicional para garantir (caso de lifetime plans)
+      .filter((sub) => sub.expirationDate !== null);
 
     functions.logger.info("Found expired subscriptions:", {
       count: expiredSubscriptions.length,

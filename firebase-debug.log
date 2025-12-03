@@ -1,0 +1,29 @@
+[debug] [2025-12-03T15:15:48.369Z] ----------------------------------------------------------------------
+[debug] [2025-12-03T15:15:48.371Z] Command:       /Users/joaovoss/.nvm/versions/node/v22.17.0/bin/node /Users/joaovoss/.nvm/versions/node/v22.17.0/bin/firebase deploy
+[debug] [2025-12-03T15:15:48.371Z] CLI Version:   14.17.0
+[debug] [2025-12-03T15:15:48.371Z] Platform:      darwin
+[debug] [2025-12-03T15:15:48.371Z] Node Version:  v22.17.0
+[debug] [2025-12-03T15:15:48.371Z] Time:          Wed Dec 03 2025 12:15:48 GMT-0300 (Brasilia Standard Time)
+[debug] [2025-12-03T15:15:48.371Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-12-03T15:15:48.442Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-12-03T15:15:48.443Z] > authorizing via signed-in user (ddtjoaop11@gmail.com)
+[debug] [2025-12-03T15:15:48.443Z] [iam] checking project app-doctor-78d15 for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]
+[debug] [2025-12-03T15:15:48.443Z] Checked if tokens are valid: true, expires at: 1764777760964
+[debug] [2025-12-03T15:15:48.443Z] Checked if tokens are valid: true, expires at: 1764777760964
+[debug] [2025-12-03T15:15:48.443Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/app-doctor-78d15:testIamPermissions [none]
+[debug] [2025-12-03T15:15:48.443Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/app-doctor-78d15:testIamPermissions x-goog-quota-user=projects/app-doctor-78d15
+[debug] [2025-12-03T15:15:48.443Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/app-doctor-78d15:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[debug] [2025-12-03T15:15:49.422Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/app-doctor-78d15:testIamPermissions 200
+[debug] [2025-12-03T15:15:49.422Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/app-doctor-78d15:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[debug] [2025-12-03T15:15:49.423Z] Checked if tokens are valid: true, expires at: 1764777760964
+[debug] [2025-12-03T15:15:49.423Z] Checked if tokens are valid: true, expires at: 1764777760964
+[debug] [2025-12-03T15:15:49.423Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/app-doctor-78d15/serviceAccounts/app-doctor-78d15@appspot.gserviceaccount.com:testIamPermissions [none]
+[debug] [2025-12-03T15:15:49.423Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/app-doctor-78d15/serviceAccounts/app-doctor-78d15@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2025-12-03T15:15:50.299Z] <<< [apiv2][status] POST https://iam.googleapis.com/v1/projects/app-doctor-78d15/serviceAccounts/app-doctor-78d15@appspot.gserviceaccount.com:testIamPermissions 200
+[debug] [2025-12-03T15:15:50.299Z] <<< [apiv2][body] POST https://iam.googleapis.com/v1/projects/app-doctor-78d15/serviceAccounts/app-doctor-78d15@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[info] 
+[info] === Deploying to 'app-doctor-78d15'...
+[info] 
+[info] i  deploying firestore, functions 
+[info] Running command: npm --prefix functions run lint
